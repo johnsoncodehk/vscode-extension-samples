@@ -10,11 +10,11 @@ import {
 	ProposedFeatures,
 	InitializeParams,
 	DidChangeConfigurationNotification,
-	CompletionItem,
-	CompletionItemKind,
-	TextDocumentPositionParams,
+	CodeLens,
+	CodeLensParams,
 	TextDocumentSyncKind,
-	InitializeResult
+	InitializeResult,
+	Range
 } from 'vscode-languageserver';
 
 import {
@@ -53,7 +53,7 @@ connection.onInitialize((params: InitializeParams) => {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
-			completionProvider: {
+			codeLensProvider: {
 				resolveProvider: true
 			}
 		}
@@ -187,21 +187,18 @@ connection.onDidChangeWatchedFiles(_change => {
 });
 
 // This handler provides the initial list of the completion items.
-connection.onCompletion(
-	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
+connection.onCodeLens(
+	(_textDocumentPosition: CodeLensParams): CodeLens[] => {
 		// The pass parameter contains the position of the text document in
 		// which code complete got requested. For the example we ignore this
 		// info and always provide the same completion items.
 		return [
 			{
-				label: 'TypeScript',
-				kind: CompletionItemKind.Text,
-				data: 1
-			},
-			{
-				label: 'JavaScript',
-				kind: CompletionItemKind.Text,
-				data: 2
+				range: Range.create(0, 0, 0, 0),
+				command: {
+					title: 'not resolve',
+					command: ''
+				}
 			}
 		];
 	}
@@ -209,14 +206,11 @@ connection.onCompletion(
 
 // This handler resolves additional information for the item selected in
 // the completion list.
-connection.onCompletionResolve(
-	(item: CompletionItem): CompletionItem => {
-		if (item.data === 1) {
-			item.detail = 'TypeScript details';
-			item.documentation = 'TypeScript documentation';
-		} else if (item.data === 2) {
-			item.detail = 'JavaScript details';
-			item.documentation = 'JavaScript documentation';
+connection.onCodeLensResolve(
+	(item: CodeLens): CodeLens => {
+		item.command = {
+			title: 'resolved',
+			command: ''
 		}
 		return item;
 	}
