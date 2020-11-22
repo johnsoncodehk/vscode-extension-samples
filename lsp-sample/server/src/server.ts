@@ -15,7 +15,7 @@ import {
 	TextDocumentSyncKind,
 	InitializeResult,
 	Range
-} from 'vscode-languageserver';
+} from 'vscode-languageserver/node';
 
 import {
 	TextDocument
