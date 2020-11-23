@@ -14,7 +14,9 @@ import {
 	CodeLensParams,
 	TextDocumentSyncKind,
 	InitializeResult,
-	Range
+	Range,
+	CodeLensRequest,
+	CodeLensResolveRequest,
 } from 'vscode-languageserver/node';
 
 import {
@@ -53,9 +55,6 @@ connection.onInitialize((params: InitializeParams) => {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Incremental,
 			// Tell the client that this server supports code completion.
-			codeLensProvider: {
-				resolveProvider: true
-			}
 		}
 	};
 	if (hasWorkspaceFolderCapability) {
@@ -78,6 +77,8 @@ connection.onInitialized(() => {
 			connection.console.log('Workspace folder change event received.');
 		});
 	}
+	connection.client.register(CodeLensRequest.type)
+	connection.client.register(CodeLensResolveRequest.type)
 });
 
 // The example settings
